@@ -3,6 +3,7 @@
 #define __BINDSNOOP_H
 
 #define TASK_COMM_LEN	16
+#define MAX_PORTS		1024
 
 struct ipv4_bind_data_t {
 	__u64 ts_us;

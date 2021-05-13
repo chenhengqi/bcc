@@ -20,10 +20,12 @@
 
 static volatile sig_atomic_t canceled = 0;
 
-pid_t traced_pid = 0;
-bool trace_failed_only = false;
-bool output_with_timestamp = false;
-static __u64 start_timestamp = 0;
+pid_t target_pid = 0;
+uid_t target_uid = -1;
+bool ignore_error = true;
+int ports[MAX_PORTS] = {};
+int port_num = 0;
+bool stat_count_only = false;
 
 const char *argp_program_version = "bindsnoop 0.1";
 const char *argp_program_bug_address =

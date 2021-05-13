@@ -7,14 +7,13 @@
 #include "bindsnoop.h"
 
 #define MAX_ENTRIES 10240
-#define MAX_PORTS 1024
 
 const volatile pid_t target_pid = 0;
-const volatile int target_uid = -1;
+const volatile uid_t target_uid = -1;
 const volatile bool ignore_error = true;
 const volatile int ports[MAX_PORTS] = {};
-const volatile int port_count = 0;
-const volatile bool count_only = false;
+const volatile int port_num = 0;
+const volatile bool stat_count_only = false;
 
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
@@ -130,18 +129,18 @@ static int probe_return(struct pt_regs *ctx, short ver)
 	sock = socket->sk;
 	inet_sock = (struct inet_sock *)sock;
 	sport = bpf_ntohs(inet_sock->inet_sport);
-	for (i = 0; i < port_count; i++) {
+	for (i = 0; i < port_num; i++) {
 		if (ports[i] == sport) {
 			matched = true;
 			break;
 		}
 	}
-	if (!matched) {
+	if (port_num && !matched) {
 		bpf_map_delete_elem(&sockets, &tid);
 		return 0;
 	}
 
-	if (count_only) {
+	if (stat_count_only) {
 		count(sock, sport, ver);
 		bpf_map_delete_elem(&sockets, &tid);
 		return 0;
