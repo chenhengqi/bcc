@@ -18,9 +18,9 @@
 
 #define warn(...) fprintf(stderr, __VA_ARGS__)
 
-static volatile sig_atomic_t canceled;
+static volatile sig_atomic_t exiting;
 
-static bool output_with_timestamp = false;
+static bool emit_timestamp = false;
 static bool timestamp_in_ms = false;
 static pid_t target_pid = 0;
 static int interval = 99999999;
@@ -59,7 +59,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 		verbose = true;
 		break;
 	case 'T':
-		output_with_timestamp = true;
+		emit_timestamp = true;
 		break;
 	case 'm':
 		timestamp_in_ms = true;
@@ -101,7 +101,7 @@ static error_t parse_arg(int key, char *arg, struct argp_state *state)
 	return 0;
 }
 
-int libbpf_print_fn(enum libbpf_print_level level,
+static int libbpf_print_fn(enum libbpf_print_level level,
 		    const char *format, va_list args)
 {
 	if (level == LIBBPF_DEBUG && !verbose)
@@ -111,7 +111,7 @@ int libbpf_print_fn(enum libbpf_print_level level,
 
 static void sig_handler(int sig)
 {
-	canceled = 1;
+	exiting = 1;
 }
 
 static char *file_op_names[] = {
@@ -141,34 +141,6 @@ static int print_hists(struct nfsdist_bpf__bss *bss)
 	}
 
 	return 0;
-}
-
-static void disable_kprobe(struct nfsdist_bpf *obj)
-{
-	bpf_program__set_autoload(obj->progs.nfs_file_read_entry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_read_return, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_write_entry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_write_return, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_open_entry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_open_return, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_fsync_entry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_fsync_return, false);
-	bpf_program__set_autoload(obj->progs.nfs_getattr_entry, false);
-	bpf_program__set_autoload(obj->progs.nfs_getattr_return, false);
-}
-
-static void disable_fentry(struct nfsdist_bpf *obj)
-{
-	bpf_program__set_autoload(obj->progs.nfs_file_read_fentry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_read_fexit, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_write_fentry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_write_fexit, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_open_fentry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_open_fexit, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_fsync_fentry, false);
-	bpf_program__set_autoload(obj->progs.nfs_file_fsync_fexit, false);
-	bpf_program__set_autoload(obj->progs.nfs_getattr_fentry, false);
-	bpf_program__set_autoload(obj->progs.nfs_getattr_fexit, false);
 }
 
 int main(int argc, char **argv)
@@ -206,9 +178,27 @@ int main(int argc, char **argv)
 	skel->rodata->in_ms = timestamp_in_ms;
 
 	if (!fentry_exists("nfs_file_read", "nfs")) {
-		disable_fentry(skel);
+		bpf_program__set_autoload(skel->progs.nfs_file_read_fentry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_read_fexit, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_write_fentry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_write_fexit, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_open_fentry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_open_fexit, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_fsync_fentry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_fsync_fexit, false);
+		bpf_program__set_autoload(skel->progs.nfs_getattr_fentry, false);
+		bpf_program__set_autoload(skel->progs.nfs_getattr_fexit, false);
 	} else {
-		disable_kprobe(skel);
+		bpf_program__set_autoload(skel->progs.nfs_file_read_entry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_read_return, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_write_entry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_write_return, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_open_entry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_open_return, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_fsync_entry, false);
+		bpf_program__set_autoload(skel->progs.nfs_file_fsync_return, false);
+		bpf_program__set_autoload(skel->progs.nfs_getattr_entry, false);
+		bpf_program__set_autoload(skel->progs.nfs_getattr_return, false);
 	}
 
 	err = nfsdist_bpf__load(skel);
@@ -225,13 +215,13 @@ int main(int argc, char **argv)
 
 	signal(SIGINT, sig_handler);
 
-	printf("Tracing nfs operation latency... Hit Ctrl-C to end.\n");
+	printf("Tracing NFS operation latency... Hit Ctrl-C to end.\n");
 
 	while (1) {
 		sleep(interval);
 		printf("\n");
 
-		if (output_with_timestamp) {
+		if (emit_timestamp) {
 			time(&t);
 			tm = localtime(&t);
 			strftime(ts, sizeof(ts), "%H:%M:%S", tm);
@@ -242,7 +232,7 @@ int main(int argc, char **argv)
 		if (err)
 			break;
 
-		if (canceled || --count == 0)
+		if (exiting || --count == 0)
 			break;
 	}
 

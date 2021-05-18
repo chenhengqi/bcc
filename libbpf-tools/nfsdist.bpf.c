@@ -7,7 +7,6 @@
 #include "nfsdist.h"
 
 #define MAX_ENTRIES		10240
-#define lock_xadd(ptr, val)	((void)__sync_fetch_and_add(ptr, val))
 
 const volatile pid_t target_pid = 0;
 const volatile bool in_ms = false;
@@ -25,7 +24,7 @@ static int probe_entry()
 {
 	__u64 pid_tgid = bpf_get_current_pid_tgid();
 	__u32 pid = pid_tgid >> 32;
-	__u32 tid = pid_tgid & 0xFFFFFFFF;
+	__u32 tid = (__u32)pid_tgid;
 	__u64 ts;
 
 	if (target_pid && target_pid != pid)
@@ -40,11 +39,10 @@ static int probe_return(enum nfs_file_op op)
 {
 	__u64 pid_tgid = bpf_get_current_pid_tgid();
 	__u32 pid = pid_tgid >> 32;
-	__u32 tid = pid_tgid & 0xFFFFFFFF;
+	__u32 tid = (__u32)pid_tgid;
 	__u64 ts = bpf_ktime_get_ns();
-	__u64 *tsp;
+	__u64 *tsp, slot;
 	__s64 delta;
-	__u64 slot;
 
 	tsp = bpf_map_lookup_elem(&starts, &tid);
 	if (!tsp)
@@ -65,7 +63,7 @@ static int probe_return(enum nfs_file_op op)
 	slot = log2l(delta);
 	if (slot >= MAX_SLOTS)
 		slot = MAX_SLOTS - 1;
-	lock_xadd(&hists[op].slots[slot], 1);
+	__sync_fetch_and_add(&hists[op].slots[slot], 1);
 
 cleanup:
 	bpf_map_delete_elem(&starts, &tid);
