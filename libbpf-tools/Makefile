@@ -28,11 +28,11 @@ APPS = \
 	execsnoop \
 	ext4dist \
 	filelife \
+	fsdist \
 	funclatency \
 	gethostlatency \
 	hardirqs \
 	llcstat \
-	nfsdist \
 	numamove \
 	offcputime \
 	opensnoop \

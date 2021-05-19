@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause) */
-#ifndef __NFSDIST_H
-#define __NFSDIST_H
+#ifndef __FSDIST_H
+#define __FSDIST_H
 
-enum nfs_file_op {
+enum fs_file_op {
 	READ,
 	WRITE,
 	OPEN,
@@ -11,10 +11,10 @@ enum nfs_file_op {
 	MAX_OP,
 };
 
-#define MAX_SLOTS	27
+#define MAX_SLOTS	32
 
 struct hist {
 	__u32 slots[MAX_SLOTS];
 };
 
-#endif /* __NFSDIST_H */
+#endif /* __FSDIST_H */
