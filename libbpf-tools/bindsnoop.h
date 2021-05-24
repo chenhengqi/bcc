@@ -3,9 +3,8 @@
 #define __BINDSNOOP_H
 
 #define TASK_COMM_LEN	16
-#define MAX_PORTS		1024
 
-struct ipv4_bind_data_t {
+struct ipv4_bind_data {
 	__u64 ts_us;
 	__u32 pid;
 	__u32 uid;
@@ -18,12 +17,12 @@ struct ipv4_bind_data_t {
 	char task[TASK_COMM_LEN];
 };
 
-struct ipv4_flow_key_t {
+struct ipv4_flow_key {
 	__u32 saddr;
 	__u16 sport;
 };
 
-struct ipv6_bind_data_t {
+struct ipv6_bind_data {
 	unsigned __int128 saddr;
 	__u64 ts_us;
 	__u32 pid;
@@ -36,7 +35,7 @@ struct ipv6_bind_data_t {
 	char task[TASK_COMM_LEN];
 };
 
-struct ipv6_flow_key_t {
+struct ipv6_flow_key {
 	unsigned __int128 saddr;
 	__u16 sport;
 };
