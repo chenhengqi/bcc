@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
 // Copyright (c) 2021 Hengqi Chen
 #include <vmlinux.h>
 #include <bpf/bpf_helpers.h>
@@ -11,7 +11,6 @@
 #define MAX_PORTS	1024
 
 const volatile pid_t target_pid = 0;
-const volatile uid_t target_uid = -1;
 const volatile bool ignore_errors = true;
 const volatile bool filter_by_port = false;
 const volatile bool count_only = false;
@@ -67,17 +66,15 @@ static void count(struct sock *sock, __u16 port, short ver)
 		ipv4_flow_key.saddr = sock->__sk_common.skc_rcv_saddr;
 		ipv4_flow_key.sport = port;
 		count = bpf_map_lookup_or_try_init(&ipv4_bind_count, &ipv4_flow_key, &zero);
-		if (count) {
+		if (count)
 			*count += 1;
-		}
 	} else {
 		bpf_probe_read_kernel(&ipv6_flow_key.saddr, sizeof(ipv6_flow_key.saddr),
 					sock->__sk_common.skc_v6_rcv_saddr.in6_u.u6_addr32);
 		ipv6_flow_key.sport = port;
 		count = bpf_map_lookup_or_try_init(&ipv6_bind_count, &ipv6_flow_key, &zero);
-		if (count) {
+		if (count)
 			*count += 1;
-		}
 	}
 }
 
@@ -86,16 +83,9 @@ static int probe_entry(struct pt_regs *ctx, struct socket *socket)
 	__u64 pid_tgid = bpf_get_current_pid_tgid();
 	__u32 pid = pid_tgid >> 32;
 	__u32 tid = (__u32)pid_tgid;
-	__u32 uid;
 
-	if (target_pid && target_pid != pid) {
+	if (target_pid && target_pid != pid)
 		return 0;
-	}
-
-	uid = bpf_get_current_uid_gid();
-	if (target_uid != -1 && target_uid != uid) {
-		return 0;
-	}
 
 	bpf_map_update_elem(&sockets, &tid, &socket, BPF_ANY);
 	return 0;
@@ -117,9 +107,8 @@ static int probe_exit(struct pt_regs *ctx, short ver)
 	int ret;
 
 	socketp = bpf_map_lookup_elem(&sockets, &tid);
-	if (!socketp) {
+	if (!socketp)
 		return 0;
-	}
 
 	ret = PT_REGS_RC(ctx);
 	if (ignore_errors && ret != 0) {
