@@ -29,6 +29,7 @@ APPS = \
 	ext4dist \
 	filelife \
 	fsdist \
+	fsslower \
 	funclatency \
 	gethostlatency \
 	hardirqs \
@@ -46,7 +47,6 @@ APPS = \
 	tcpconnect \
 	tcpconnlat \
 	vfsstat \
-	xfsslower \
 	#
 
 COMMON_OBJ = \

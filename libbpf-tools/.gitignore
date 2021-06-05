@@ -12,6 +12,7 @@
 /ext4dist
 /filelife
 /fsdist
+/fsslower
 /funclatency
 /gethostlatency
 /hardirqs
@@ -29,4 +30,3 @@
 /tcpconnect
 /tcpconnlat
 /vfsstat
-/xfsslower
