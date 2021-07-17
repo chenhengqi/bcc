@@ -33,6 +33,7 @@ APPS = \
 	funclatency \
 	gethostlatency \
 	hardirqs \
+	kvmexit \
 	llcstat \
 	numamove \
 	offcputime \
