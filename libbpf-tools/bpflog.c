@@ -73,6 +73,7 @@ static void sig_int(int signo)
 
 static void handle_event(void *ctx, int cpu, void *data, __u32 data_sz)
 {
+	struct log *log = data;
 	struct tm *tm;
 	char ts[16];
 	time_t t;
@@ -80,6 +81,15 @@ static void handle_event(void *ctx, int cpu, void *data, __u32 data_sz)
 	time(&t);
 	tm = localtime(&t);
 	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
+	if (log->len < 12) {
+		printf("%-4ld ", log->len);
+		for (int i = 0; i < log->len; i++) {
+			printf("%x ", log->content[i]);
+		}
+		printf("\n");
+	} else {
+		printf("%-4ld %s", log->len, log->content);
+	}
 }
 
 static void handle_lost_events(void *ctx, int cpu, __u64 lost_cnt)
@@ -129,25 +139,22 @@ int main(int argc, char **argv)
 
 	pb_opts.sample_cb = handle_event;
 	pb_opts.lost_cb = handle_lost_events;
-	// pb = perf_buffer__new(bpf_map__fd(obj->maps.events), PERF_BUFFER_PAGES,
-	// 		&pb_opts);
-	// err = libbpf_get_error(pb);
-	// if (err) {
-	// 	warn("failed to open perf buffer: %d\n", err);
-	// 	goto cleanup;
-	// }
+	pb = perf_buffer__new(bpf_map__fd(obj->maps.logs), PERF_BUFFER_PAGES,
+			&pb_opts);
+	err = libbpf_get_error(pb);
+	if (err) {
+		warn("failed to open perf buffer: %d\n", err);
+		goto cleanup;
+	}
 
 	if (signal(SIGINT, sig_int) == SIG_ERR) {
 		warn("can't set signal handler: %s\n", strerror(-errno));
 		goto cleanup;
 	}
 
-	printf("%-8s %-7s %-16s %-10s %-s\n",
-	       "TIME", "PID", "COMM", "LATms", "HOST");
-
 	while (1) {
-		// if ((err = perf_buffer__poll(pb, PERF_POLL_TIMEOUT_MS)) < 0)
-		// 	break;
+		if ((err = perf_buffer__poll(pb, PERF_POLL_TIMEOUT_MS)) < 0)
+			break;
 		if (exiting)
 			goto cleanup;
 		sleep(1);

@@ -2,13 +2,12 @@
 /* Copyright (c) 2021 Hengqi Chen */
 #include <vmlinux.h>
 #include <bpf/bpf_helpers.h>
-#include <bpf/bpf_core_read.h>
-#include <bpf/bpf_tracing.h>
 #include "maps.bpf.h"
 #include "bpflog.h"
 
-#define MAX_ENTRIES	10240
+#define MAX_ENTRIES	1024
 
+static const int zero = 0;
 const char container_comm[16] = "containerd-shim";
 
 struct {
@@ -18,6 +17,19 @@ struct {
 	__type(value, int);
 	__uint(map_flags, BPF_F_NO_PREALLOC);
 } cgroup_ids SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
+	__uint(max_entries, 1);
+	__type(key, int);
+	__type(value, struct log);
+} heap SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_PERF_EVENT_ARRAY);
+	__uint(key_size, sizeof(__u32));
+	__uint(value_size, sizeof(__u32));
+} logs SEC(".maps");
 
 static bool strequal(const char *a, const char *b)
 {
@@ -31,9 +43,8 @@ static bool strequal(const char *a, const char *b)
 }
 
 SEC("tracepoint/syscalls/sys_enter_execve")
-int tracepoint__syscalls__sys_enter_execve(struct trace_event_raw_sys_enter *ctx)
+int trace_exec(struct trace_event_raw_sys_enter *ctx)
 {
-	static int zero = 0;
 	char comm[16] = {};
 	__u64 cgroup_id;
 	int *ref_count;
@@ -48,21 +59,29 @@ int tracepoint__syscalls__sys_enter_execve(struct trace_event_raw_sys_enter *ctx
 	return 0;
 }
 
-SEC("tracepoint/sched/sys_enter_execve")
-int tracepoint__syscalls__sys_enter_execve(struct trace_event_raw_sys_enter *ctx)
+SEC("tracepoint/syscalls/sys_enter_write")
+int trace_write(struct trace_event_raw_sys_enter *ctx)
 {
-	static int zero = 0;
-	char comm[16] = {};
 	__u64 cgroup_id;
+	struct log *log;
 	int *ref_count;
+	int fd = (int)ctx->args[0];
 
-	bpf_get_current_comm(comm, sizeof(comm));
-	if (strequal(comm, container_comm)) {
-		cgroup_id = bpf_get_current_cgroup_id();
-		ref_count = bpf_map_lookup_or_try_init(&cgroup_ids, &cgroup_id, &zero);
-		if (ref_count)
-			__sync_fetch_and_add(ref_count, 1);
-	}
+	if (fd != 1 && fd != 2)
+		return 0;
+
+	cgroup_id = bpf_get_current_cgroup_id();
+	ref_count = bpf_map_lookup_elem(&cgroup_ids, &cgroup_id);
+	if (!ref_count)
+		return 0;
+
+	log = bpf_map_lookup_elem(&heap, &zero);
+	if (!log)
+		return 0;
+
+	bpf_probe_read_user(log->content, sizeof(log->content), (const char *)ctx->args[1]);
+	log->len = (size_t)ctx->args[2];
+	bpf_perf_event_output(ctx, &logs, BPF_F_CURRENT_CPU, log, sizeof(*log));
 	return 0;
 }
 
