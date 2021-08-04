@@ -19,7 +19,7 @@
 #include "trace_helpers.h"
 #include "uprobe_helpers.h"
 
-#define PERF_BUFFER_PAGES	16
+#define PERF_BUFFER_PAGES	1024
 #define PERF_POLL_TIMEOUT_MS	100
 #define warn(...) fprintf(stderr, __VA_ARGS__)
 
@@ -75,20 +75,22 @@ static void handle_event(void *ctx, int cpu, void *data, __u32 data_sz)
 {
 	struct log *log = data;
 	struct tm *tm;
-	char ts[16];
+	char ts[16], buf[LINE_LIMIT];
 	time_t t;
 
 	time(&t);
 	tm = localtime(&t);
 	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
+	printf("%d %s\n", log->pid, log->comm);
 	if (log->len < 12) {
-		printf("%-4ld ", log->len);
+		printf("%-4lld ", log->len);
 		for (int i = 0; i < log->len; i++) {
 			printf("%x ", log->content[i]);
 		}
 		printf("\n");
 	} else {
-		printf("%-4ld %s", log->len, log->content);
+		memcpy(buf, log->content, log->len);
+		printf("%-4lld %s", log->len, log->content);
 	}
 }
 

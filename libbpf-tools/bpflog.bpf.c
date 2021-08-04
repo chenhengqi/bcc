@@ -8,7 +8,7 @@
 #define MAX_ENTRIES	1024
 
 static const int zero = 0;
-const char container_comm[16] = "containerd-shim";
+const char container_comm[16] = "runc:[2:INIT]";
 
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
@@ -81,6 +81,9 @@ int trace_write(struct trace_event_raw_sys_enter *ctx)
 
 	bpf_probe_read_user(log->content, sizeof(log->content), (const char *)ctx->args[1]);
 	log->len = (size_t)ctx->args[2];
+	log->cgroup_id = cgroup_id;
+	log->pid = bpf_get_current_pid_tgid() >> 32;
+	bpf_get_current_comm(log->comm, sizeof(log->comm));
 	bpf_perf_event_output(ctx, &logs, BPF_F_CURRENT_CPU, log, sizeof(*log));
 	return 0;
 }

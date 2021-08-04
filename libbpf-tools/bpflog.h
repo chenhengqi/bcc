@@ -3,9 +3,12 @@
 #define __BPFLOG_H
 
 #define LINE_LIMIT	8192
-
+#define TASK_COMM_LEN	16
 struct log {
-	size_t len;
+	__u64 cgroup_id;
+	__u64 len;
+	__u32 pid;
+	char comm[TASK_COMM_LEN];
 	char content[LINE_LIMIT];
 };
 
