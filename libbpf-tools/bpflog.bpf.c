@@ -2,10 +2,11 @@
 /* Copyright (c) 2021 Hengqi Chen */
 #include <vmlinux.h>
 #include <bpf/bpf_helpers.h>
+#include <bpf/bpf_core_read.h>
 #include "maps.bpf.h"
 #include "bpflog.h"
 
-#define MAX_ENTRIES	1024
+#define MAX_ENTRIES	10240
 
 static const int zero = 0;
 const char container_comm[16] = "runc:[2:INIT]";
@@ -13,10 +14,18 @@ const char container_comm[16] = "runc:[2:INIT]";
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
 	__uint(max_entries, MAX_ENTRIES);
-	__type(key, __u64);
+	__type(key, __u32);
 	__type(value, int);
 	__uint(map_flags, BPF_F_NO_PREALLOC);
-} cgroup_ids SEC(".maps");
+} processes SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_HASH);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, __u32);
+	__type(value, struct value);
+	__uint(map_flags, BPF_F_NO_PREALLOC);
+} writes SEC(".maps");
 
 struct {
 	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
@@ -45,46 +54,93 @@ static bool strequal(const char *a, const char *b)
 SEC("tracepoint/syscalls/sys_enter_execve")
 int trace_exec(struct trace_event_raw_sys_enter *ctx)
 {
+	struct task_struct *task;
 	char comm[16] = {};
-	__u64 cgroup_id;
-	int *ref_count;
+	__u32 ppid, pid;
+	int *val;
 
 	bpf_get_current_comm(comm, sizeof(comm));
 	if (strequal(comm, container_comm)) {
-		cgroup_id = bpf_get_current_cgroup_id();
-		ref_count = bpf_map_lookup_or_try_init(&cgroup_ids, &cgroup_id, &zero);
-		if (ref_count)
-			__sync_fetch_and_add(ref_count, 1);
+		pid = bpf_get_current_pid_tgid() >> 32;
+		bpf_map_update_elem(&processes, &pid, &zero, BPF_ANY);
+		return 0;
 	}
+
+	task = (struct task_struct *)bpf_get_current_task();
+	ppid = BPF_CORE_READ(task, real_parent, tgid);
+	val = bpf_map_lookup_elem(&processes, &ppid);
+	if (val) {
+		pid = bpf_get_current_pid_tgid() >> 32;
+		bpf_map_update_elem(&processes, &pid, &zero, BPF_ANY);
+	}
+
+	return 0;
+}
+
+SEC("tracepoint/sched/sched_process_exit")
+int trace_exit(struct trace_event_raw_sys_enter *ctx)
+{
+	char comm[16] = {};
+	__u32 pid;
+
+
+	bpf_get_current_comm(comm, sizeof(comm));
+	if (strequal(comm, container_comm))
+		return 0;
+
+	pid = bpf_get_current_pid_tgid() >> 32;
+	bpf_map_delete_elem(&processes, &pid);
 	return 0;
 }
 
 SEC("tracepoint/syscalls/sys_enter_write")
 int trace_write(struct trace_event_raw_sys_enter *ctx)
 {
-	__u64 cgroup_id;
-	struct log *log;
-	int *ref_count;
-	int fd = (int)ctx->args[0];
+	int fd = (int)ctx->args[0], *val;
+	struct value args;
+	__u64 pid_tgid;
+	__u32 pid, tid;
 
 	if (fd != 1 && fd != 2)
 		return 0;
 
-	cgroup_id = bpf_get_current_cgroup_id();
-	ref_count = bpf_map_lookup_elem(&cgroup_ids, &cgroup_id);
-	if (!ref_count)
+	pid_tgid = bpf_get_current_pid_tgid();
+	pid = pid_tgid >> 32;
+	tid = (__u32)pid_tgid;
+	val = bpf_map_lookup_elem(&processes, &pid);
+	if (!val)
+		return 0;
+
+	args.data = (const char *)ctx->args[1];
+	args.len = (size_t)ctx->args[2];
+	bpf_map_update_elem(&writes, &tid, &args, BPF_ANY);
+	return 0;
+}
+
+SEC("tracepoint/syscalls/sys_exit_write")
+int trace_write_end(struct trace_event_raw_sys_exit *ctx)
+{
+	__u64 pid_tgid = bpf_get_current_pid_tgid();
+	__u32 pid = pid_tgid >> 32;
+	__u32 tid = (__u32)pid_tgid;
+	struct value *args;
+	struct log *log;
+
+	args = bpf_map_lookup_elem(&writes, &tid);
+	if (!args)
 		return 0;
 
 	log = bpf_map_lookup_elem(&heap, &zero);
 	if (!log)
 		return 0;
 
-	bpf_probe_read_user(log->content, sizeof(log->content), (const char *)ctx->args[1]);
-	log->len = (size_t)ctx->args[2];
-	log->cgroup_id = cgroup_id;
-	log->pid = bpf_get_current_pid_tgid() >> 32;
+	log->pid = pid;
+	log->len = args->len;
+	log->ts = bpf_ktime_get_ns();
+	bpf_probe_read_user(log->content, sizeof(log->content), args->data);
 	bpf_get_current_comm(log->comm, sizeof(log->comm));
 	bpf_perf_event_output(ctx, &logs, BPF_F_CURRENT_CPU, log, sizeof(*log));
+	bpf_map_delete_elem(&writes, &tid);
 	return 0;
 }
 

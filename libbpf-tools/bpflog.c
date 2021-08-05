@@ -75,23 +75,23 @@ static void handle_event(void *ctx, int cpu, void *data, __u32 data_sz)
 {
 	struct log *log = data;
 	struct tm *tm;
-	char ts[16], buf[LINE_LIMIT];
+	char ts[16];//, buf[LINE_LIMIT];
 	time_t t;
 
 	time(&t);
 	tm = localtime(&t);
 	strftime(ts, sizeof(ts), "%H:%M:%S", tm);
-	printf("%d %s\n", log->pid, log->comm);
-	if (log->len < 12) {
-		printf("%-4lld ", log->len);
-		for (int i = 0; i < log->len; i++) {
-			printf("%x ", log->content[i]);
-		}
-		printf("\n");
-	} else {
-		memcpy(buf, log->content, log->len);
-		printf("%-4lld %s", log->len, log->content);
-	}
+	printf("%d %s %lld %s\n", log->pid, log->comm, log->len, log->content);
+	// if (log->len < 12) {
+	// 	printf("%-4lld ", log->len);
+	// 	for (int i = 0; i < log->len; i++) {
+	// 		printf("%x ", log->content[i]);
+	// 	}
+	// 	printf("\n");
+	// } else {
+	// 	memcpy(buf, log->content, log->len);
+	// 	printf("%-4lld %s", log->len, log->content);
+	// }
 }
 
 static void handle_lost_events(void *ctx, int cpu, __u64 lost_cnt)
