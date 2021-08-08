@@ -21,10 +21,11 @@
 /funclatency
 /gethostlatency
 /hardirqs
+/killsnoop
 /llcstat
+/mountsnoop
 /nfsdist
 /nfsslower
-/mountsnoop
 /numamove
 /offcputime
 /opensnoop
@@ -32,6 +33,7 @@
 /runqlat
 /runqlen
 /runqslower
+/sigsnoop
 /softirqs
 /solisten
 /statsnoop
