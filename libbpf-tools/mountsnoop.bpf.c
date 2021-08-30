@@ -135,3 +135,227 @@ int umount_exit(struct trace_event_raw_sys_exit *ctx)
 }
 
 char LICENSE[] SEC("license") = "Dual BSD/GPL";
+
+struct {
+	__uint(type, BPF_MAP_TYPE_HASH);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map1 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_ARRAY);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map2 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map3 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type,BPF_MAP_TYPE_PERF_EVENT_ARRAY);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map4 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_PERCPU_HASH);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map5 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map6 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_STACK_TRACE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map7 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_CGROUP_ARRAY);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map8 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_LRU_HASH);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map9 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_LRU_PERCPU_HASH);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map10 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_LPM_TRIE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map11 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_ARRAY_OF_MAPS);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map12 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_HASH_OF_MAPS);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map13 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_DEVMAP);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map14 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_SOCKMAP);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map15 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_CPUMAP);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map16 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_XSKMAP);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map17 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_SOCKHASH);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map18 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_CGROUP_STORAGE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map19 SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_REUSEPORT_SOCKARRAY);
+	__uint(max_entries, MAX_ENTRIES);
+	__type(key, int);
+	__type(value, int);
+} map20 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map21 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_QUEUE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map22 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_STACK);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map23 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_SK_STORAGE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map24 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_DEVMAP_HASH);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map25 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_STRUCT_OPS);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map26 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_RINGBUF);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map27 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_INODE_STORAGE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map28 SEC(".maps");
+
+// TARGET
+// struct {
+// 	__uint(type, BPF_MAP_TYPE_TASK_STORAGE);
+// 	__uint(max_entries, MAX_ENTRIES);
+// 	__type(key, int);
+// 	__type(value, int);
+// } map29 SEC(".maps");
