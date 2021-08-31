@@ -179,7 +179,7 @@ struct {
 	__type(value, int);
 } map6 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_STACK_TRACE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -209,7 +209,7 @@ struct {
 	__type(value, int);
 } map10 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_LPM_TRIE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -217,7 +217,7 @@ struct {
 // 	__type(value, int);
 // } map11 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_ARRAY_OF_MAPS);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -225,7 +225,7 @@ struct {
 // 	__type(value, int);
 // } map12 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_HASH_OF_MAPS);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -249,7 +249,7 @@ struct {
 // 	__type(value, int);
 // } map15 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_CPUMAP);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -273,7 +273,7 @@ struct {
 // 	__type(value, int);
 // } map18 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_CGROUP_STORAGE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -288,7 +288,7 @@ struct {
 	__type(value, int);
 } map20 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -296,7 +296,7 @@ struct {
 // 	__type(value, int);
 // } map21 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_QUEUE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -304,7 +304,7 @@ struct {
 // 	__type(value, int);
 // } map22 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_STACK);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -312,7 +312,7 @@ struct {
 // 	__type(value, int);
 // } map23 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_SK_STORAGE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -328,7 +328,7 @@ struct {
 // 	__type(value, int);
 // } map25 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_STRUCT_OPS);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -336,7 +336,7 @@ struct {
 // 	__type(value, int);
 // } map26 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_RINGBUF);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -344,7 +344,7 @@ struct {
 // 	__type(value, int);
 // } map27 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_INODE_STORAGE);
 // 	__uint(max_entries, MAX_ENTRIES);
@@ -352,7 +352,7 @@ struct {
 // 	__type(value, int);
 // } map28 SEC(".maps");
 
-// TARGET
+// FAIL
 // struct {
 // 	__uint(type, BPF_MAP_TYPE_TASK_STORAGE);
 // 	__uint(max_entries, MAX_ENTRIES);
