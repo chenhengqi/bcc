@@ -1,0 +1,90 @@
+insn: code=24, dst_reg=0, src_reg=0, off=0, imm=25336192
+before build_insn: ctx.idx=12
+after build_insn: ctx.idx=16, ret=1
+insn: code=121, dst_reg=0, src_reg=0, off=0, imm=0
+before build_insn: ctx.idx=16
+after build_insn: ctx.idx=17, ret=0
+insn: code=21, dst_reg=0, src_reg=0, off=2, imm=777
+before build_insn: ctx.idx=17
+after build_insn: ctx.idx=21, ret=0
+insn: code=183, dst_reg=1, src_reg=0, off=0, imm=1
+before build_insn: ctx.idx=21
+after build_insn: ctx.idx=22, ret=0
+insn: code=5, dst_reg=0, src_reg=0, off=1, imm=0
+before build_insn: ctx.idx=22
+after build_insn: ctx.idx=23, ret=0
+insn: code=183, dst_reg=1, src_reg=0, off=0, imm=2
+before build_insn: ctx.idx=23
+after build_insn: ctx.idx=24, ret=0
+insn: code=24, dst_reg=2, src_reg=4, off=1, imm=34052308
+before build_insn: ctx.idx=24
+after build_insn: ctx.idx=27, ret=1
+insn: code=183, dst_reg=3, src_reg=0, off=0, imm=0
+before build_insn: ctx.idx=27
+after build_insn: ctx.idx=28, ret=0
+insn: code=183, dst_reg=4, src_reg=0, off=0, imm=0
+before build_insn: ctx.idx=28
+after build_insn: ctx.idx=29, ret=0
+insn: code=181, dst_reg=1, src_reg=0, off=2, imm=8388608
+before build_insn: ctx.idx=29
+after build_insn: ctx.idx=33, ret=0
+insn: code=180, dst_reg=0, src_reg=0, off=0, imm=-7
+before build_insn: ctx.idx=33
+after build_insn: ctx.idx=35, ret=0
+insn: code=5, dst_reg=0, src_reg=0, off=16, imm=0
+before build_insn: ctx.idx=35
+after build_insn: ctx.idx=36, ret=0
+insn: code=123, dst_reg=10, src_reg=6, off=-24, imm=0
+before build_insn: ctx.idx=36
+after build_insn: ctx.idx=37, ret=0
+insn: code=123, dst_reg=10, src_reg=7, off=-16, imm=0
+before build_insn: ctx.idx=37
+after build_insn: ctx.idx=38, ret=0
+insn: code=123, dst_reg=10, src_reg=8, off=-8, imm=0
+before build_insn: ctx.idx=38
+after build_insn: ctx.idx=39, ret=0
+insn: code=191, dst_reg=6, src_reg=1, off=0, imm=0
+before build_insn: ctx.idx=39
+after build_insn: ctx.idx=40, ret=0
+insn: code=180, dst_reg=7, src_reg=0, off=0, imm=0
+before build_insn: ctx.idx=40
+after build_insn: ctx.idx=41, ret=0
+insn: code=191, dst_reg=8, src_reg=3, off=0, imm=0
+before build_insn: ctx.idx=41
+after build_insn: ctx.idx=42, ret=0
+insn: code=61, dst_reg=7, src_reg=6, off=5, imm=0
+before build_insn: ctx.idx=42
+after build_insn: ctx.idx=46, ret=0
+insn: code=191, dst_reg=1, src_reg=7, off=0, imm=0
+before build_insn: ctx.idx=46
+after build_insn: ctx.idx=47, ret=0
+insn: code=191, dst_reg=2, src_reg=8, off=0, imm=0
+before build_insn: ctx.idx=47
+after build_insn: ctx.idx=48, ret=0
+insn: code=133, dst_reg=0, src_reg=1, off=1, imm=30382900
+before build_insn: ctx.idx=48
+after build_insn: ctx.idx=53, ret=0
+insn: code=7, dst_reg=7, src_reg=0, off=0, imm=1
+before build_insn: ctx.idx=53
+after build_insn: ctx.idx=54, ret=0
+insn: code=21, dst_reg=0, src_reg=0, off=-6, imm=0
+before build_insn: ctx.idx=54
+after build_insn: ctx.idx=57, ret=0
+insn: code=191, dst_reg=0, src_reg=7, off=0, imm=0
+before build_insn: ctx.idx=57
+after build_insn: ctx.idx=58, ret=0
+insn: code=121, dst_reg=6, src_reg=10, off=-24, imm=0
+before build_insn: ctx.idx=58
+after build_insn: ctx.idx=59, ret=0
+insn: code=121, dst_reg=7, src_reg=10, off=-16, imm=0
+before build_insn: ctx.idx=59
+after build_insn: ctx.idx=60, ret=0
+insn: code=121, dst_reg=8, src_reg=10, off=-8, imm=0
+before build_insn: ctx.idx=60
+after build_insn: ctx.idx=61, ret=0
+insn: code=183, dst_reg=0, src_reg=0, off=0, imm=0
+before build_insn: ctx.idx=61
+after build_insn: ctx.idx=62, ret=0
+insn: code=149, dst_reg=0, src_reg=0, off=0, imm=0
+before build_insn: ctx.idx=62
+after build_insn: ctx.idx=63, ret=0
